@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Restaurant Profile | Restaurant{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-dark mb-4" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="{{ url_for('owner_shop') }}">Your Restaurant Dashboard</a>
+        <a href="{{ url_for('owner_shop') }}" class="btn btn-warning text-dark">Back to dashboard</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h3 mb-2">Restaurant profile</h1>
+                    <p class="text-muted mb-4">Keep your restaurant information up to date for customers.</p>
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="shop-name" class="form-label">Restaurant name</label>
+                            <input id="shop-name" name="shop_name" type="text" class="form-control" value="{{ shop['shop_name'] }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="owner-name" class="form-label">Owner name</label>
+                            <input id="owner-name" name="owner_name" type="text" class="form-control" value="{{ shop['owner_name'] }}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="contact" class="form-label">Contact or phone number</label>
+                            <input id="contact" name="contact" type="text" class="form-control" value="{{ shop['contact'] }}" required>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="{{ url_for('owner_shop') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Save profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

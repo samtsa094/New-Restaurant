@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Restaurant{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-dark mb-4" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="/">Restaurant</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active text-white" href="/">Home</a>
+                </li>
+            </ul>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#registerModal">
+                    Register
+                </button>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    Login
+                </button>
+                <a href="/view_cart" class="btn btn-success">
+                    View Cart <span class="badge bg-light text-dark ms-2">{{ cart_count }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="hero-section text-white p-4 p-md-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="badge bg-warning-subtle text-dark mb-3">Fresh picks for your home</span>
+                <h1 class="display-6 fw-bold mb-3">Order local favorites in one place.</h1>
+                <p class="mb-0 fs-5">Find trusted restaurants, compare menu items, and build your cart without leaving the page.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="#products" class="btn btn-light btn-lg px-4">Browse menu items</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Register Your Restaurant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/register" method="post" id="register_form">
+                    <input type="hidden" name="form_id" value="register_form">
+                    <div class="mb-3">
+                        <input name="shop_name" type="text" class="form-control" placeholder="Name of the restaurant" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="owner_name" type="text" class="form-control" placeholder="Name of the owner" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="contact" type="text" class="form-control" placeholder="Contact/Phone Number" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="email" type="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="password" type="password" class="form-control" placeholder="Password" required minlength="6">
+                    </div>
+                    <div class="modal-footer px-0 pb-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login as Restaurant Owner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/login" method="post" id="login_form">
+                    <input type="hidden" name="form_id" value="login_form">
+                    <div class="mb-3">
+                        <input name="email" type="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="password" type="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <div class="modal-footer px-0 pb-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-heading mb-0">Featured restaurants</h2>
+        <span class="stat-badge">{{ shops|length }} restaurant(s)</span>
+    </div>
+    {% if shops %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+            {% for shop in shops %}
+                <div class="shop-card mx-1 mt-3">
+                    <div class="card-body text-center">
+                        <h5 class="text-primary fw-bold mb-1">{{ shop["owner_name"] }}'s Restaurant</h5>
+                        <h3 class="card-title mt-3">{{ shop["shop_name"] }}</h3>
+                        <p class="text-muted mb-3">Contact: {{ shop["contact"] }}</p>
+                        <span class="badge bg-success-subtle text-success-emphasis mb-3">Home delivery available</span>
+                        <div>
+                            <a href="/view_shop/{{ shop['email'] }}" class="btn btn-primary">View Restaurant</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state text-center mt-3">No restaurants available yet.</div>
+    {% endif %}
+</div>
+
+<div class="container mb-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Search and Filter</h5>
+            <form method="GET" action="/" class="row g-3">
+                <div class="col-md-6">
+                    <label for="product-search" class="visually-hidden">Search menu items</label>
+                    <input id="product-search" type="search" name="search" class="form-control" placeholder="Search menu items..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="shop" class="form-select">
+                        <option value="">All Restaurants</option>
+                        {% for shop in shops %}
+                            <option value="{{ shop['email'] }}" {% if shop['email'] == shop_filter %}selected{% endif %}>
+                                {{ shop['shop_name'] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+            {% if search_query or shop_filter %}
+                <div class="mt-2">
+                    <a href="/" class="btn btn-outline-secondary btn-sm">Clear Filters</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div id="products" class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-heading mb-0">All menu items</h2>
+        <span class="stat-badge">{{ products|length }} menu item(s)</span>
+    </div>
+    {% if products %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+            {% for product in products %}
+                <div class="product-card mx-1 mt-3">
+                    <div class="card-image-wrap">
+                        <img src="{{ product['link'] }}" alt="{{ product['name'] }}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title mb-2">{{ product['name'] }}</h3>
+                        <p class="large mb-2">
+                            <a href="{{ url_for('view_shop', email=product['email']) }}">
+                                {{ shop_names.get(product['email'], 'Local restaurant') }}
+                            </a>
+                        </p>
+                        <p class="text-muted mb-3">{{ product['description'] }}</p>
+                        <h5 class="mt-2 fw-bold">${{ '%.2f'|format(product['price']) }}</h5>
+                        {% if product['quantity'] > 0 %}
+                            {% if product['quantity'] <= 5 %}
+                                <p class="text-danger mb-3"><strong>Low stock: {{ product['quantity'] }} left</strong></p>
+                            {% else %}
+                                <p class="text-success mb-3"><strong>{{ product['quantity'] }} in stock</strong></p>
+                            {% endif %}
+                            <form action="/add_cart_home/{{ product['_id'] }}" method="post" class="row g-2 align-items-center">
+                                <div class="col-6">
+                                    <input name="quantity" type="number" min="1" max="{{ product['quantity'] }}" class="form-control" placeholder="Quantity" required>
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-success w-100">Add to Cart</button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <p class="text-danger mb-3"><strong>Out of stock</strong></p>
+                            <button class="btn btn-secondary w-100" disabled>Unavailable</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state text-center mt-3">
+            {% if search_query or shop_filter %}
+                <h3>No matching menu items</h3>
+                <p>Try a different search or clear the filters.</p>
+                <a href="/" class="btn btn-outline-primary">Clear filters</a>
+            {% else %}
+                <p class="mb-0">No menu items available right now.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

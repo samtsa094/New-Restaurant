@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}{{ name }}'s Restaurant{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-dark mb-4" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="/">Your Restaurant Dashboard</a>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <a href="{{ url_for('shop_profile') }}" class="btn btn-outline-warning">Restaurant profile</a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Add menu item</button>
+            <form action="/logout" method="post" class="m-0">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="hero-section text-white p-4 p-md-5">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-warning-subtle text-dark mb-3">Owner dashboard</span>
+                <h1 class="display-6 fw-bold mb-2">Welcome back, {{ name.split()[0] }}!</h1>
+                <p class="mb-0 fs-5">Manage your stock, add menu items, and keep your restaurant organized.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <button type="button" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#addModal">Add new menu item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Add Menu Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_product" method="post" id="add_product_form">
+                    <input type="hidden" name="form_id" value="add_product_form">
+                    <div class="mb-3">
+                        <input name="name" type="text" class="form-control" placeholder="Menu item name" required maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <input name="description" type="text" class="form-control" placeholder="Description" required>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input name="price" type="number" step="0.01" min="0" class="form-control" placeholder="Unit price" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="quantity" type="number" min="1" class="form-control" placeholder="Quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <input name="link" type="url" class="form-control" placeholder="Image URL" required>
+                    </div>
+                    <div class="modal-footer px-0 pb-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Menu Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-heading mb-0">Available stock</h2>
+        <span class="stat-badge">{{ products|length }} menu item(s)</span>
+    </div>
+    {% if products %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
+            {% for product in products %}
+                <div class="product-card mx-1 mt-3">
+                    <div class="card-header text-end bg-white border-0 p-3">
+                        <a href="{{ url_for('edit_product', id=product['_id']) }}" class="btn btn-sm btn-outline-success">Edit</a>
+                        <form action="/delete/{{ product['_id'] }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this menu item?');">Delete</button>
+                        </form>
+                    </div>
+                    <div class="card-image-wrap">
+                        <img src="{{ product['link'] }}" alt="{{ product['name'] }}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title mb-2">{{ product['name'] }}</h3>
+                        <p class="text-muted mb-3">{{ product['description'] }}</p>
+                        <h5 class="fw-bold">${{ '%.2f'|format(product['price']) }}</h5>
+                        {% if product['quantity'] > 0 %}
+                            {% if product['quantity'] <= 5 %}
+                                <p class="text-danger mb-3"><strong>Low stock: {{ product['quantity'] }} left</strong></p>
+                            {% else %}
+                                <p class="text-success mb-3"><strong>In stock: {{ product['quantity'] }} left</strong></p>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-danger mb-3"><strong>Out of stock</strong></p>
+                        {% endif %}
+                        <form action="/add_stock/{{ product['_id'] }}" method="post" class="row g-2 align-items-center">
+                            <div class="col-6">
+                                <input name="quantity" type="number" min="1" class="form-control" placeholder="Quantity" required>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-success w-100">Add Stock</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state text-center">You have not added any menu items yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

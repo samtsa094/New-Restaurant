@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Cart | Restaurant{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg bg-dark mb-4" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="/">Restaurant</a>
+        <a href="/" class="btn btn-warning ms-auto text-dark">Back Home</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-1">
+    <div class="checkout-panel text-center mb-4">
+        <h1 class="mb-2">Your Cart</h1>
+        <h3 class="mb-0">Total: ${{ '%.2f'|format(total) }}</h3>
+    </div>
+    <div class="container p-0 rounded-2">
+        {% if cart %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover shadow-sm rounded overflow-hidden">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in cart %}
+                            <tr>
+                                <th>{{ loop.index }}</th>
+                                <td><strong>{{ product['name'] }}</strong></td>
+                                <td>${{ '%.2f'|format(product['price']) }}</td>
+                                <td>
+                                    <form action="/update_cart_quantity" method="post" class="d-flex gap-2 align-items-center">
+                                        <input type="hidden" name="product_id" value="{{ product['product_id'] }}">
+                                        <input type="number" name="quantity" value="{{ product['quantity'] }}" min="1" class="form-control form-control-sm" style="width: 70px" required>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary" title="Update quantity">Update</button>
+                                    </form>
+                                </td>
+                                <td><strong>${{ '%.2f'|format(product['quantity'] * product['price']) }}</strong></td>
+                                <td>
+                                    <form action="/remove_from_cart/{{ product['product_id'] }}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove item">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state text-center">
+                <h3>Your cart is empty.</h3>
+                <a href="/" class="btn btn-primary">Continue shopping</a>
+            </div>
+        {% endif %}
+    </div>
+    {% if cart %}
+        <div class="row mt-2">
+            <div class="col-md-8">
+                <a href="/" class="btn btn-info btn-lg">Continue Shopping</a>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <form action="/checkout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-lg">Proceed to Checkout</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
